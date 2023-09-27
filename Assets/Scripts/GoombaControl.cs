@@ -77,5 +77,8 @@ public class GoombaControl : MonoBehaviour
             
             isJumping = false;
         }
+        else if(collision.transform.CompareTag("enemy")){
+            gameObject.SetActive(false);
+        }
     }
 }
