@@ -18,6 +18,14 @@ public class GoombaControl : MonoBehaviour
     private Rigidbody2D rb2d;
     public float jumpForce = 400f;
 
+    [Header("Jump")]
+    public float jumpAngleThreshold = 45f;
+    
+    private bool isJumping = false;
+
+    [Header("Debug")]
+    [SerializeField]private bool debugJump = false; 
+
 
     // Start is called before the first frame update
     void Awake()
@@ -44,7 +52,10 @@ public class GoombaControl : MonoBehaviour
     }
 
     private void OnJump(InputAction.CallbackContext context){
+        if(isJumping) return;
+
         rb2d.AddForce(Vector2.up * jumpForce);
+        isJumping = true;
     }
 
     private void MoveX(){
@@ -53,5 +64,18 @@ public class GoombaControl : MonoBehaviour
 
         Vector3 movement = Vector3.right * speed * Time.deltaTime;
         transform.position += movement;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision){
+        if(collision.transform.CompareTag("ground")){
+            Vector2 contactPosition = collision.GetContact(0).point;
+            Vector2 normal = collision.GetContact(0).normal;
+            
+            if(debugJump) Debug.DrawRay(contactPosition, normal * 2f, Color.red, 3f);
+
+            if(Vector2.Angle(Vector2.up, normal) > jumpAngleThreshold) return;
+            
+            isJumping = false;
+        }
     }
 }
